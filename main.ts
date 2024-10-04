@@ -49,78 +49,6 @@ namespace runtimeVariables {
     return true;
   }
 
-  function convertToType(value: any, type: VariableType): any {
-    switch (type) {
-      case VariableType.Number:
-        if (typeof value === "number") {
-          return value;
-        } else if (typeof value === "string") {
-          const num = parseFloat(value);
-          return isNaN(num) ? 0 : num;
-        } else {
-          return 0;
-        }
-      case VariableType.String:
-        if (value === null || value === undefined) {
-          return "";
-        } else {
-          // Use concatenation to convert value to string
-          return "" + value;
-        }
-      case VariableType.Boolean:
-        if (typeof value === "boolean") {
-          return value;
-        } else if (typeof value === "string") {
-          const lowerValue = value.toLowerCase();
-          if (lowerValue === "true") return true;
-          if (lowerValue === "false") return false;
-          // Non-empty strings are considered true
-          return value.length > 0;
-        } else if (typeof value === "number") {
-          return value !== 0;
-        } else {
-          // Use double negation to convert other types to boolean
-          return !!value;
-        }
-      case VariableType.Sprite:
-        // Check if value is a Sprite by looking for Sprite-specific properties
-        if (value && value.kind !== undefined && value.image !== undefined) {
-          return value as Sprite;
-        } else {
-          return null;
-        }
-      case VariableType.Image:
-        // Check if value is an Image by looking for Image-specific properties
-        if (
-          value &&
-          value.width !== undefined &&
-          value.height !== undefined &&
-          value.getPixel !== undefined
-        ) {
-          return value as Image;
-        } else {
-          return null;
-        }
-      default:
-        return value;
-    }
-  }
-
-  export enum VariableType {
-    //% block="any"
-    Any = 0,
-    //% block="number"
-    Number = 1,
-    //% block="string"
-    String = 2,
-    //% block="boolean"
-    Boolean = 3,
-    //% block="sprite"
-    Sprite = 4,
-    //% block="image"
-    Image = 5,
-  }
-
   /**
    * Sets a variable to a specified value.
    * @param key The name of the variable, supports dot notation for nested variables.
@@ -136,17 +64,13 @@ namespace runtimeVariables {
   /**
    * Gets the value of a variable, optionally specifying the type.
    * @param key The name of the variable.
-   * @param type [Optional] The type to get the variable as, defaults to 'any'.
    */
-  //% block="get %key || as %type"
+  //% block="get %key"
   //% weight=80
   //% group="Variable Operations"
   //% expandableArgumentMode="toggle"
-  //% type.defl=VariableType.Any
-  export function get(key: string, type: VariableType = VariableType.Any): any {
+  export function get(key: string): any {
     let value = getNestedValue(variables, key);
-
-    return convertToType(value, type);
   }
 
   /**
@@ -186,6 +110,67 @@ namespace runtimeVariables {
   //% group="Variable Operations"
   export function Exists(key: string): boolean {
     return existsNestedKey(variables, key);
+  }
+
+  //% block="Convert %value to Number"
+  //% group="Type Conversion"
+  export function convertToNumber(value: any): number {
+    if (typeof value === "number") {
+      return value;
+    } else if (typeof value === "string") {
+      const num = parseFloat(value);
+      return isNaN(num) ? 0 : num;
+    } else {
+      return 0;
+    }
+  }
+  //% block="Convert %value to String"
+  //% group="Type Conversion"
+  export function convertToString(value: any): string {
+    if (value === null || value === undefined) {
+      return "";
+    } else {
+      return "" + value;
+    }
+  }
+  //% block="Convert %value to Boolean"
+  //% group="Type Conversion"
+  export function convertToBoolean(value: any): boolean {
+    if (typeof value === "boolean") {
+      return value;
+    } else if (typeof value === "string") {
+      const lowerValue = value.toLowerCase();
+      if (lowerValue === "true") return true;
+      if (lowerValue === "false") return false;
+      return value.length > 0;
+    } else if (typeof value === "number") {
+      return value !== 0;
+    } else {
+      return !!value;
+    }
+  }
+  //% block="Convert %value to Sprite"
+  //% group="Type Conversion"
+  export function convertToSprite(value: any): Sprite {
+    if (value && value.kind !== undefined && value.image !== undefined) {
+      return value as Sprite;
+    } else {
+      return null;
+    }
+  }
+  //% block="Convert %value to Image"
+  //% group="Type Conversion"
+  export function convertToImage(value: any): Image {
+    if (
+      value &&
+      value.width !== undefined &&
+      value.height !== undefined &&
+      value.getPixel !== undefined
+    ) {
+      return value as Image;
+    } else {
+      return null;
+    }
   }
 
   /**

@@ -1,4 +1,4 @@
-//% color=#AA278D weight=100 icon="e443" block="Runtime Variables"
+//% color=#4ef0f2 weight=100 icon="\uf468" block="Runtime Variables"
 namespace runtimeVariables {
   let variables: { [key: string]: any } = {};
 

@@ -1,6 +1,6 @@
 {
     "name": "RuntimeVars",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "Allows you to create, store, and edit runtime variables within the game",
     "dependencies": {
         "device": "*"
